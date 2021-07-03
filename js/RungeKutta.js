@@ -1,9 +1,9 @@
 class RungeKutta {
     constructor(h, To, Y1_inicial, Y2_inicial) {
-        this.h = parseFloat(h);
-        this.T = parseFloat(To);
-        this.Y1 = parseFloat(Y1_inicial);
-        this.Y2 = parseFloat(Y2_inicial);
+        this.h = parsearDecimales(h);
+        this.T = parsearDecimales(To);
+        this.Y1 = parsearDecimales(Y1_inicial);
+        this.Y2 = parsearDecimales(Y2_inicial);
         this.k1 = 0;
         this.k2 = 0;
         this.k3 = 0;
@@ -16,14 +16,15 @@ class RungeKutta {
         this.Y2prox;
     
     }
+
     //Calculo Runge Kutta
     calcularProxY1() {
-        this.Y1prox = (this.Y1 + ((this.k1 + 2 * this.k2 + 2 * this.k3 + this.k4)/6)).toFixed(4);
-        this.Y1prox = parseFloat(this.Y1prox);
+        this.Y1prox = (this.Y1 + ((this.k1 + 2 * this.k2 + 2 * this.k3 + this.k4)/6));
+    
     }
     calcularProxY2() {
-        this.Y2prox = (this.Y2 + ((this.l1 + 2 * this.l2 + 2 * this.l3 + this.l4)/6)).toFixed(4);
-        this.Y2prox = parseFloat(this.Y2prox);
+        this.Y2prox = (this.Y2 + ((this.l1 + 2 * this.l2 + 2 * this.l3 + this.l4)/6));
+    
     }
 
     
@@ -36,35 +37,26 @@ class RungeKutta {
         this.l1 = this.calcularl1(this.h, this.Y2, this.Y1);
 
         //k2 = h * (Y2+0.5*l1) {coef. l asociados a las variables x2}
-        this.k2 = this.calculark2(this.h,this.getY2(),this.l1);
+        this.k2 = this.calculark2(this.h,this.Y2,this.l1);
 
         //L2= h*(3*(Y2+0,5*L1)-2*(X1+0,5*K1))
-        this.l2 = this.calcularl2(this.h, this.getY2(),this.getY1(),this.l1,this.k1);
+        this.l2 = this.calcularl2(this.h, this.Y2,this.Y1,this.l1,this.k1);
 
         //k3 = h * (x2 + 0.5*l2)
-        this.k3 = this.calculark3(this.h, this.getY2(),this.l2);
+        this.k3 = this.calculark3(this.h, this.Y2,this.l2);
 
         //L3= h*(3*(Y2+0,5*L2)-2*(Y1+0,5*K2))
-        this.l3 = this.calcularl3(this.h,this.getY2,this.l2,this.getY1(),this.k2);
+        this.l3 = this.calcularl3(this.h,this.Y2,this.l2,this.Y1,this.k2);
 
         //k4 = h*(Y2+l3)
-        this.k4 = this.calculark4(this.h, this.getY2(), this.l3);
+        this.k4 = this.calculark4(this.h, this.Y2, this.l3);
 
         //L4= h*(3*(Y2+L3)-2*(Y1+K3))
-        this.l4 = this.calcularl4(this.h,this.getY2(),this.l3,this.getY1(),this.k3);
-
-        this.k1 = parseFloat(this.k1);
-        this.k2 = parseFloat(this.k2);
-        this.k3 = parseFloat(this.k3);
-        this.k4 = parseFloat(this.k4);
-        this.l1 = parseFloat(this.l1);
-        this.l2 = parseFloat(this.l2);
-        this.l3 = parseFloat(this.l3);
-        this.l4 = parseFloat(this.l4);
+        this.l4 = this.calcularl4(this.h,this.Y2,this.l3,this.Y1,this.k3);
 
     }
 
-    calculark1(h,Y2){
+    calculark1(h, Y2){
         return h*Y2;
     }
 
@@ -73,11 +65,11 @@ class RungeKutta {
     }
 
     calculark2(h,Y2,l1){
-        return h*(Y2+0,5*l1);
+        return h*(Y2+ 0.5 * l1);
     }
 
     calcularl2(h, Y2,Y1,l1,k1){
-        return h*(3*(Y2+0,5*l1)-2*(Y1+0,5*k1));
+        return h*(3*(Y2+0.5*l1)-2*(Y1+0.5*k1));
     }
 
     calculark3(h,Y2,l2){
@@ -85,7 +77,7 @@ class RungeKutta {
     }
 
     calcularl3(h,Y2,l2,Y1,k2){
-        return h*(3*(Y2+0,5*l2)-2*(Y1+0,5*k2));
+        return h*(3*(Y2+0.5*l2)-2*(Y1+0.5*k2));
     }
 
     calculark4(h,Y2,l3){
