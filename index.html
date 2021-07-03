@@ -7,31 +7,28 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-
-	<!-- <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script> -->
-	<script type="text/javascript" src="js/RungeKutta.js"></script>
-	<script type="text/javascript" src="js/helper.js"></script>
-	<link rel="stylesheet" href="css/tabs.css">
 	<script src="http://code.highcharts.com/highcharts.js"></script>
 	<script src="http://code.highcharts.com/modules/exporting.js"></script>
 
 
-	<script type="text/javascript">
-		var rungeKutta;
+	<script type="text/javascript" src="js/RungeKutta.js"></script>
+	<script type="text/javascript" src="js/helper.js"></script>
+	<link rel="stylesheet" href="css/tabs.css">
 
+	<script type="text/javascript">
 		$(document).ready(function () {
 
 			$('#btnCalcular').click(function () {
-
+				// TODO: agregar validaciones
 				//h, To, Y2, Y2, Tf
 				if ($.isNumeric($('#inputH1').val()) && $.isNumeric($('#inputH2').val()) &&
 					$.isNumeric($('#inputTo').val()) && $.isNumeric($('#inputY1').val()) &&
 					$.isNumeric($('#inputY2').val()) && $.isNumeric($('#inputTf').val()) &&
 					$('#inputTo').val() >= 0 && $('#inputTf').val() > 0) {
 					// genera tabla h1	
-					generarTabla($('#inputH1').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "tabla-runge-kutta-h1");
+					generarTabla($('#inputH1').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "tabla-runge-kutta-h1", 3);
 					// genera tabla h2
-					generarTabla($('#inputH2').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "tabla-runge-kutta-h2");
+					generarTabla($('#inputH2').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "tabla-runge-kutta-h2", 4);
 				}
 				else {
 					alert("Compruebe que todos los campos esten completos y sean numericos. Los campos To y Tf deben ser To >=0 y Tf >0.");
@@ -39,238 +36,28 @@
 			});
 
 			$('#btnGraficar').click(function () {
-				$('#tabla-runge-kutta').hide();
-				$('#grafico-runge-kutta').show();
-
-				if ($.isNumeric($('#inputH').val()) && $.isNumeric($('#inputTo').val()) && $.isNumeric($('#inputY1').val()) && $.isNumeric($('#inputY2').val()) && $.isNumeric($('#inputTf').val()) && $('#inputTo').val() >= 0 && $('#inputTf').val() > 0 && $.isNumeric($('#mostrarDesdeT').val()) && $.isNumeric($('#mostrarHastaT').val()) && $('#mostrarDesdeT').val() >= 0 && $('#mostrarHastaT').val() >= 0)
-					generarGrafico($('#inputH').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), $('#mostrarDesdeT').val(), $('#mostrarHastaT').val());
-				else
+				// TODO: agregar validaciones
+				if ($.isNumeric($('#inputH1').val()) && $.isNumeric($('#inputH2').val()) &&
+					$.isNumeric($('#inputTo').val()) &&
+					$.isNumeric($('#inputY1').val()) && $.isNumeric($('#inputY2').val()) &&
+					$.isNumeric($('#inputTf').val()) && $('#inputTo').val() >= 0 &&
+					$('#inputTf').val() > 0) {
+					// grafico h1
+					generarGrafico($('#inputH1').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "grafico-runge-kutta-h1", 3);
+					// grafico h2
+					generarGrafico($('#inputH2').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "grafico-runge-kutta-h2", 4);
+				}
+				else {
 					alert("Compruebe que todos los campos esten completos y sean numericos. Los campos To y Tf deben ser To >=0 y Tf >0.");
+				}
 			});
-
-			$('#btnNuevo').click(function () {
-				$('#tabla-runge-kutta').hide();
-				$('#grafico-runge-kutta').show();
-
-				if ($.isNumeric($('#inputH').val()) && $.isNumeric($('#inputTo').val()) && $.isNumeric($('#inputY1').val()) && $.isNumeric($('#inputY2').val()) && $.isNumeric($('#inputTf').val()) && $('#inputTo').val() >= 0 && $('#inputTf').val() > 0 && $.isNumeric($('#mostrarDesdeT').val()) && $.isNumeric($('#mostrarHastaT').val()) && $('#mostrarDesdeT').val() >= 0 && $('#mostrarHastaT').val() >= 0)
-					generarGraficoNuevo($('#inputH').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), $('#mostrarDesdeT').val(), $('#mostrarHastaT').val());
-				else
-					alert("Compruebe que todos los campos esten completos y sean numericos. Los campos To y Tf deben ser To >=0 y Tf >0.");
-			});
-
 		});
-
-
-
-		function generarTabla(h, To, Y1, Y2, Tf, idTabla) {
-			let $bodyTabla = $(`#${idTabla} tbody`);
-			console.log($bodyTabla);
-			$bodyTabla.empty();
-			rungeKutta = new RungeKutta(h, To, Y1, Y2);
-
-
-			let paso = h;
-
-			for (let proxT = parseFloat(To); proxT <= Tf; paso++) {
-				//calculo los Ki y Li
-				rungeKutta.calcularKiLi();
-				//calculo el Y1(i+1)
-				rungeKutta.calcularProxY1();
-				//calculo el Y2(i+1)
-				rungeKutta.calcularProxY2();
-
-
-				//completo la rabla con los datos obtenidos
-				$bodyTabla.append(
-					$('<tr>').append(
-						$('<td>').text(rungeKutta.getT().toFixed(4)),
-						$('<td>').text(rungeKutta.getY1().toFixed(4)),
-						$('<td>').text(rungeKutta.getY2().toFixed(4)),
-						$('<td>').text(rungeKutta.getK1().toFixed(4)),
-						$('<td>').text(rungeKutta.getK2().toFixed(4)),
-						$('<td>').text(rungeKutta.getK3().toFixed(4)),
-						$('<td>').text(rungeKutta.getK4().toFixed(4)),
-						$('<td>').text(rungeKutta.getL1().toFixed(4)),
-						$('<td>').text(rungeKutta.getL2().toFixed(4)),
-						$('<td>').text(rungeKutta.getL3().toFixed(4)),
-						$('<td>').text(rungeKutta.getL4().toFixed(4)),
-						$('<td>').text(rungeKutta.getProxY1().toFixed(4)),
-						$('<td>').text(rungeKutta.getProxY2().toFixed(4))
-					)
-				);
-
-				proxT = parsearDecimales(rungeKutta.getT() + rungeKutta.getH());
-				let proxY1 = rungeKutta.getProxY1();
-				let proxY2 = rungeKutta.getProxY2();
-
-				rungeKutta.setT(proxT);
-				rungeKutta.setY1(proxY1);
-				rungeKutta.setY2(proxY2);
-			}
-
-		}
-
-		function generarGrafico(h, To, Y1, Y2, Tf, desde, hasta) {
-			var tFF = Tf;
-			var paso = h;
-			var desde = desde;
-			var hasta = hasta;
-			var arrayTiempo = new Array();
-			var arrayY1 = new Array();
-			var arrayY2 = new Array();
-			rungeKutta = new RungeKutta(h, To, Y1, Y2);
-
-			for (proxT = 0; proxT <= tFF; paso++) {
-				//calculo los Ki
-				rungeKutta.calcularKi();
-				//calculo los Li
-				rungeKutta.calcularLi();
-
-				//calculo el Y1(i+1)
-				rungeKutta.calcularProxY1();
-				//calculo el Y2(i+1)
-				rungeKutta.calcularProxY2();
-
-				if (desde <= proxT && hasta >= proxT) {
-
-					//completo el grafico
-					arrayTiempo.push(rungeKutta.getT());
-					arrayY1.push(rungeKutta.getY1());
-					arrayY2.push(rungeKutta.getY2());
-
-				}
-
-
-
-				var proxT = rungeKutta.getT() + rungeKutta.getH();
-				var proxY1 = rungeKutta.getProxY1();
-				var proxY2 = rungeKutta.getProxY2();
-
-				rungeKutta.setT(proxT);
-				rungeKutta.setY1(proxY1);
-				rungeKutta.setY2(proxY2);
-			}
-
-
-			$('#grafico-runge-kutta').highcharts({
-				chart: {
-					type: 'line'
-				},
-				title: {
-					text: 'Variacion Y1 e Y2 en el Tiempo'
-				},
-
-				xAxis: {
-					categories: arrayTiempo
-				},
-				yAxis: {
-					title: {
-						text: 'Valores Y1 e Y2'
-					}
-				},
-				plotOptions: {
-					line: {
-						dataLabels: {
-							enabled: true
-						},
-						/*  enableMouseTracking: false */
-					}
-				},
-				series: [{
-					name: 'Y1',
-					data: arrayY1
-				}, {
-					name: 'Y2',
-					data: arrayY2
-				}]
-			});
-
-
-
-		}
-
-		//Nuevo grafico
-		function generarGraficoNuevo(h, To, Y1, Y2, Tf, desde, hasta) {
-			var tFF = Tf;
-			var paso = h;
-			var desde = desde;
-			var hasta = hasta;
-			var arrayTiempo = new Array();
-			var arrayY1 = new Array();
-			var arrayY2 = new Array();
-			rungeKutta = new RungeKutta(h, To, Y1, Y2);
-
-			for (proxT = 0; proxT <= tFF; paso++) {
-				//calculo los Ki
-				rungeKutta.calcularKi();
-				//calculo los Li
-				rungeKutta.calcularLi();
-
-				//calculo el Y1(i+1)
-				rungeKutta.calcularProxY1();
-				//calculo el Y2(i+1)
-				rungeKutta.calcularProxY2();
-
-				if (desde <= proxT && hasta >= proxT) {
-
-					//completo el grafico
-					//arrayTiempo.push(rungeKutta.getT());
-					arrayY1.push(rungeKutta.getY1());
-					arrayY2.push(rungeKutta.getY2());
-
-				}
-
-
-
-				var proxT = rungeKutta.getT() + rungeKutta.getH();
-				var proxY1 = rungeKutta.getProxY1();
-				var proxY2 = rungeKutta.getProxY2();
-
-				rungeKutta.setT(proxT);
-				rungeKutta.setY1(proxY1);
-				rungeKutta.setY2(proxY2);
-			}
-
-
-			$('#grafico-runge-kutta').highcharts({
-				chart: {
-					type: 'line'
-				},
-				title: {
-					text: 'Variacion Y1 e Y2 en el Tiempo'
-				},
-
-				xAxis: {
-					categories: arrayY2
-				},
-				yAxis: {
-					title: {
-						text: 'Valores Y1'
-					}
-				},
-				plotOptions: {
-					line: {
-						dataLabels: {
-							enabled: true
-						},
-						/*  enableMouseTracking: false */
-					}
-				},
-				series: [{
-					name: 'Y1',
-					data: arrayY1
-				}]
-			});
-
-
-
-		}
 
 	</script>
 </head>
 
 <body>
-	<h1>Runge Kutta 4to Orden EJERCICIO 152 </h1>
+	<h1>Runge Kutta 4to Orden </h1>
 	<table class="table table-condensed">
 		<tr>
 			<td><label>Condiciones Iniciales: </label></td>
@@ -289,9 +76,8 @@
 			<td><input type="number" id="inputH2" value=0.01></td>
 		</tr>
 		<tr>
-			<td><button id="btnCalcular">Calcular</button></td>
+			<td><button id="btnCalcular">Calcular tablas</button></td>
 			<td><button id="btnGraficar">Graficar</button></td>
-			<td><button id="btnNuevo">Graficar Nuevo</button></td>
 		</tr>
 	</table>
 	<br>
@@ -355,9 +141,9 @@
 
 	<div id="Grafico" class="tabcontent">
 		<h3>Grafico</h3>
-		<div id="grafico-runge-kutta" style="min-width: 310px; height: 400px; margin: 0 auto; display:none;"></div>
+		<div id="grafico-runge-kutta-h1" style="min-width: 310px; height: 400px; margin: 5px auto;"></div>
+		<div id="grafico-runge-kutta-h2" style="min-width: 310px; height: 400px; margin: 5px auto;"></div>
 	</div>
-
 </body>
 
 </html>
