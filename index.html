@@ -1,149 +1,225 @@
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Ejercicio 152</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"
+    />
 
-<head>
-	<meta charset="utf-8">
-	<title>Ejercicio 152</title>
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
-	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script src="http://code.highcharts.com/highcharts.js"></script>
-	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script type="text/javascript" src="js/RungeKutta.js"></script>
+    <script type="text/javascript" src="js/helper.js"></script>
+    <link rel="stylesheet" href="css/index.css" />
 
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#btnCalcular").click(function () {
+          // TODO: agregar validaciones
+          //h, To, Y2, Y2, Tf
+          if (
+            $.isNumeric($("#inputH1").val()) &&
+            $.isNumeric($("#inputH2").val()) &&
+            $.isNumeric($("#inputTo").val()) &&
+            $.isNumeric($("#inputY1").val()) &&
+            $.isNumeric($("#inputY2").val()) &&
+            $.isNumeric($("#inputTf").val()) &&
+            $("#inputTo").val() >= 0 &&
+            $("#inputTf").val() > 0
+          ) {
+            // genera tabla h1
+            generarTabla(
+              $("#inputH1").val(),
+              $("#inputTo").val(),
+              $("#inputY1").val(),
+              $("#inputY2").val(),
+              $("#inputTf").val(),
+              "tabla-runge-kutta-h1",
+              3
+            );
+            // genera tabla h2
+            generarTabla(
+              $("#inputH2").val(),
+              $("#inputTo").val(),
+              $("#inputY1").val(),
+              $("#inputY2").val(),
+              $("#inputTf").val(),
+              "tabla-runge-kutta-h2",
+              4
+            );
+          } else {
+            alert(
+              "Compruebe que todos los campos esten completos y sean numericos. Los campos To y Tf deben ser To >=0 y Tf >0."
+            );
+          }
+        });
 
-	<script type="text/javascript" src="js/RungeKutta.js"></script>
-	<script type="text/javascript" src="js/helper.js"></script>
-	<link rel="stylesheet" href="css/tabs.css">
+        $("#btnGraficar").click(function () {
+          // TODO: agregar validaciones
+          if (
+            $.isNumeric($("#inputH1").val()) &&
+            $.isNumeric($("#inputH2").val()) &&
+            $.isNumeric($("#inputTo").val()) &&
+            $.isNumeric($("#inputY1").val()) &&
+            $.isNumeric($("#inputY2").val()) &&
+            $.isNumeric($("#inputTf").val()) &&
+            $("#inputTo").val() >= 0 &&
+            $("#inputTf").val() > 0
+          ) {
+            // grafico h1
+            generarGrafico(
+              $("#inputH1").val(),
+              $("#inputTo").val(),
+              $("#inputY1").val(),
+              $("#inputY2").val(),
+              $("#inputTf").val(),
+              "grafico-runge-kutta-h1",
+              3
+            );
+            // grafico h2
+            generarGrafico(
+              $("#inputH2").val(),
+              $("#inputTo").val(),
+              $("#inputY1").val(),
+              $("#inputY2").val(),
+              $("#inputTf").val(),
+              "grafico-runge-kutta-h2",
+              4
+            );
+          } else {
+            alert(
+              "Compruebe que todos los campos esten completos y sean numericos. Los campos To y Tf deben ser To >=0 y Tf >0."
+            );
+          }
+        });
+      });
+    </script>
+  </head>
 
-	<script type="text/javascript">
-		$(document).ready(function () {
+  <body>
+    <div id="runge-kutta">
+      <h1>Runge Kutta 4to Orden</h1>
+      <div class="row">
+        <div class="col-xs-12">
+          <p>Ingrese los datos para calcular</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="col-xs-4">
+            <b>Y1 = </b> <input type="number" id="inputY1" value="-1" />
+          </div>
+          <div class="col-xs-4">
+            <b>Y2 = </b> <input type="number" id="inputY2" value="1" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="col-xs-4">
+            <b>t0 = </b> <input type="number" id="inputTo" value="0" />
+          </div>
+          <div class="col-xs-4">
+            <b>tf = </b><input type="number" id="inputTf" value="1" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="col-xs-4">
+            <b>h1 = </b><input type="number" id="inputH1" value="0.1" />
+          </div>
+          <div class="col-xs-4">
+            <b>h2 = </b><input type="number" id="inputH2" value="0.01" />
+          </div>
+        </div>
+      </div>
 
-			$('#btnCalcular').click(function () {
-				// TODO: agregar validaciones
-				//h, To, Y2, Y2, Tf
-				if ($.isNumeric($('#inputH1').val()) && $.isNumeric($('#inputH2').val()) &&
-					$.isNumeric($('#inputTo').val()) && $.isNumeric($('#inputY1').val()) &&
-					$.isNumeric($('#inputY2').val()) && $.isNumeric($('#inputTf').val()) &&
-					$('#inputTo').val() >= 0 && $('#inputTf').val() > 0) {
-					// genera tabla h1	
-					generarTabla($('#inputH1').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "tabla-runge-kutta-h1", 3);
-					// genera tabla h2
-					generarTabla($('#inputH2').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "tabla-runge-kutta-h2", 4);
-				}
-				else {
-					alert("Compruebe que todos los campos esten completos y sean numericos. Los campos To y Tf deben ser To >=0 y Tf >0.");
-				}
-			});
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="col-xs-1">
+            <button class="btn btn-primary" id="btnCalcular">
+              Calcular tablas
+            </button>
+          </div>
+          <div class="col-xs-1">
+            <button class="btn btn-primary" id="btnGraficar">Graficar</button>
+          </div>
+        </div>
+      </div>
 
-			$('#btnGraficar').click(function () {
-				// TODO: agregar validaciones
-				if ($.isNumeric($('#inputH1').val()) && $.isNumeric($('#inputH2').val()) &&
-					$.isNumeric($('#inputTo').val()) &&
-					$.isNumeric($('#inputY1').val()) && $.isNumeric($('#inputY2').val()) &&
-					$.isNumeric($('#inputTf').val()) && $('#inputTo').val() >= 0 &&
-					$('#inputTf').val() > 0) {
-					// grafico h1
-					generarGrafico($('#inputH1').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "grafico-runge-kutta-h1", 3);
-					// grafico h2
-					generarGrafico($('#inputH2').val(), $('#inputTo').val(), $('#inputY1').val(), $('#inputY2').val(), $('#inputTf').val(), "grafico-runge-kutta-h2", 4);
-				}
-				else {
-					alert("Compruebe que todos los campos esten completos y sean numericos. Los campos To y Tf deben ser To >=0 y Tf >0.");
-				}
-			});
-		});
+      <br />
+      <!-- Tab links -->
+      <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'TablaH1')">H1</button>
+        <button class="tablinks" onclick="openTab(event, 'TablaH2')">H2</button>
+        <button class="tablinks" onclick="openTab(event, 'Grafico')">
+          Gráficos
+        </button>
+      </div>
+      <!-- Tab content -->
+      <div id="TablaH1" class="tabcontent">
+        <h3>Tabla H1</h3>
+        <table id="tabla-runge-kutta-h1" class="table table-striped">
+          <thead>
+            <tr>
+              <th>t</th>
+              <th>Y1</th>
+              <th>Y2</th>
+              <th>k1</th>
+              <th>k2</th>
+              <th>k3</th>
+              <th>k4</th>
+              <th>l1</th>
+              <th>l2</th>
+              <th>l3</th>
+              <th>l4</th>
+              <th>Y1(i+1)</th>
+              <th>Y2(i+1)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="TablaH2" class="tabcontent">
+        <h3>Tabla H2</h3>
+        <table id="tabla-runge-kutta-h2" class="table table-striped">
+          <thead>
+            <tr>
+              <th>t</th>
+              <th>Y1</th>
+              <th>Y2</th>
+              <th>k1</th>
+              <th>k2</th>
+              <th>k3</th>
+              <th>k4</th>
+              <th>l1</th>
+              <th>l2</th>
+              <th>l3</th>
+              <th>l4</th>
+              <th>Y1(i+1)</th>
+              <th>Y2(i+1)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
 
-	</script>
-</head>
-
-<body>
-	<h1>Runge Kutta 4to Orden </h1>
-	<table class="table table-condensed">
-		<tr>
-			<td><label>Condiciones Iniciales: </label></td>
-			<td>Y1 = <input type="number" id="inputY1" value=-1></td>
-			<td>Y2 = <input type="number" id="inputY2" value=1></td>
-			<td>t0 = <input type="number" id="inputTo" value=0></td>
-		</tr>
-		<tr>
-			<td><label>Calcular hasta (tFinal): </label></td>
-			<td><input type="number" id="inputTf" value=1></td>
-		</tr>
-		<tr>
-			<td><label>Valor de h1</label></td>
-			<td><input type="number" id="inputH1" value=0.1></td>
-			<td><label>Valor de h2</label></td>
-			<td><input type="number" id="inputH2" value=0.01></td>
-		</tr>
-		<tr>
-			<td><button id="btnCalcular">Calcular tablas</button></td>
-			<td><button id="btnGraficar">Graficar</button></td>
-		</tr>
-	</table>
-	<br>
-	<!-- Tab links -->
-	<div class="tab">
-		<button class="tablinks" onclick="openTab(event, 'TablaH1')">H1</button>
-		<button class="tablinks" onclick="openTab(event, 'TablaH2')">H2</button>
-		<button class="tablinks" onclick="openTab(event, 'Grafico')">Grafico</button>
-	</div>
-	<!-- Tab content -->
-	<div id="TablaH1" class="tabcontent">
-		<h3>Tabla H1</h3>
-		<table id="tabla-runge-kutta-h1" class="table table-striped">
-			<thead>
-				<tr>
-					<th>t</th>
-					<th>Y1</th>
-					<th>Y2</th>
-					<th>k1</th>
-					<th>k2</th>
-					<th>k3</th>
-					<th>k4</th>
-					<th>l1</th>
-					<th>l2</th>
-					<th>l3</th>
-					<th>l4</th>
-					<th>Y1(i+1)</th>
-					<th>Y2(i+1)</th>
-				</tr>
-			</thead>
-			<tbody>
-
-			</tbody>
-		</table>
-	</div>
-	<div id="TablaH2" class="tabcontent">
-		<h3>Tabla H2</h3>
-		<table id="tabla-runge-kutta-h2" class="table table-striped">
-			<thead>
-				<tr>
-					<th>t</th>
-					<th>Y1</th>
-					<th>Y2</th>
-					<th>k1</th>
-					<th>k2</th>
-					<th>k3</th>
-					<th>k4</th>
-					<th>l1</th>
-					<th>l2</th>
-					<th>l3</th>
-					<th>l4</th>
-					<th>Y1(i+1)</th>
-					<th>Y2(i+1)</th>
-				</tr>
-			</thead>
-			<tbody>
-
-			</tbody>
-		</table>
-	</div>
-
-	<div id="Grafico" class="tabcontent">
-		<h3>Grafico</h3>
-		<div id="grafico-runge-kutta-h1" style="min-width: 310px; height: 400px; margin: 5px auto;"></div>
-		<div id="grafico-runge-kutta-h2" style="min-width: 310px; height: 400px; margin: 5px auto;"></div>
-	</div>
-</body>
-
+      <div id="Grafico" class="tabcontent">
+        <h3>Graficos</h3>
+        <div
+          id="grafico-runge-kutta-h1"
+          style="min-width: 310px; height: 400px; margin: 5px auto"
+        ></div>
+        <div
+          id="grafico-runge-kutta-h2"
+          style="min-width: 310px; height: 400px; margin: 5px auto"
+        ></div>
+      </div>
+    </div>
+  </body>
 </html>
